@@ -70,11 +70,6 @@ class TransactionService
                     break;
             }
 
-            $userLock->release();
-            if (isset($senderLock)) {
-                $senderLock->release();
-            }
-
             DB::commit();
 
             TransactionEvent::dispatch($dto);
@@ -82,6 +77,11 @@ class TransactionService
             DB::rollBack();
 
             throw $e;
+        } finally {
+            $userLock->release();
+            if (isset($senderLock)) {
+                $senderLock->release();
+            }
         }
     }
 
